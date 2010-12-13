@@ -1,43 +1,48 @@
+#!/usr/bin/python
+
 import sys
 import string
 import DNS
 from IPy import *
 
+# Prepare DNS resolver
 DNS.ParseResolvConf()
-r = DNS.DnsRequest(name = sys.argv[1], qtype='A')
 
-a = r.req()
+# Request IP for host name given in first argument
+dnsAnswer = DNS.DnsRequest(name = sys.argv[1], qtype='A').req()
 
-if len(a.answers) == 0:
+# Exit if no DNS A record was found for the host name
+if len(dnsAnswer.answers) == 0:
 	sys.exit()
 
+# Either use the host name as domain name or use the second argument if given
 if len(sys.argv) > 2:
-   domain = sys.argv[2]
+   domainNameGiven = sys.argv[2]
 else:
-   domain = sys.argv[1]
+   domainNameGiven = sys.argv[1]
 
-i = IP(a.answers[0]['data'])
-l = domain
+firstIPForHostname = IP(dnsAnswer.answers[0]['data'])
+domainNameSearched = domainNameGiven
 
-while (l[-len(domain):len(l)] == domain):
-   s = string.split(i.strNormal(),'.')
-   s.reverse()
-   r = DNS.DnsRequest(name = string.join(s,'.')+'.in-addr.arpa', qtype='PTR')
-   b = r.req()
-   i = IP(i.int() + 1)
-   if len(b.answers) != 0:
-      l = b.answers[0]['data']
-      print l
+# Keep iterating as long as we stay inside the given domain
+while (domainNameSearched[-len(domainNameGiven):len(domainNameSearched)] == domainNameGiven):
+   reversedIPArray = string.split(firstIPForHostname.strNormal(),'.')
+   reversedIPArray.reverse()
+   dnsAnswerTwo = DNS.DnsRequest(name = string.join(reversedIPArray,'.')+'.in-addr.arpa', qtype='PTR').req()
+   firstIPForHostname = IP(firstIPForHostname.int() + 1)
+   if len(dnsAnswerTwo.answers) != 0:
+      domainNameSearched = dnsAnswerTwo.answers[0]['data']
+      print domainNameSearched
 
-i = IP(a.answers[0]['data'])
-l = domain
+#i = IP(a.answers[0]['data'])
+#l = domain
 
-while (l[-len(domain):len(l)] == domain):
-   s = string.split(i.strNormal(),'.')
-   s.reverse()
-   r = DNS.DnsRequest(name = string.join(s,'.')+'.in-addr.arpa', qtype='PTR')
-   b = r.req()
-   i = IP(i.int() - 1)
-   if len(b.answers) != 0:
-      l = b.answers[0]['data']
-      print l
+#while (l[-len(domain):len(l)] == domain):
+#   s = string.split(i.strNormal(),'.')
+#   s.reverse()
+#   r = DNS.DnsRequest(name = string.join(s,'.')+'.in-addr.arpa', qtype='PTR')
+#   b = r.req()
+#   i = IP(i.int() - 1)
+#   if len(b.answers) != 0:
+#      l = b.answers[0]['data']
+#      print l
