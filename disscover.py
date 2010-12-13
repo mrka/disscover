@@ -33,16 +33,3 @@ while (domainNameSearched[-len(domainNameGiven):len(domainNameSearched)] == doma
    if len(dnsAnswerTwo.answers) != 0:
       domainNameSearched = dnsAnswerTwo.answers[0]['data']
       print domainNameSearched
-
-#i = IP(a.answers[0]['data'])
-#l = domain
-
-#while (l[-len(domain):len(l)] == domain):
-#   s = string.split(i.strNormal(),'.')
-#   s.reverse()
-#   r = DNS.DnsRequest(name = string.join(s,'.')+'.in-addr.arpa', qtype='PTR')
-#   b = r.req()
-#   i = IP(i.int() - 1)
-#   if len(b.answers) != 0:
-#      l = b.answers[0]['data']
-#      print l
